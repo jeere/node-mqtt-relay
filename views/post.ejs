@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+
+  <body>
+    <h1>Post data</h1>
+    <form name="dataform" method="POST" action="/post" id="dataform">
+      <input type="text" name="topic" id="topic" />
+      <input type="text" name="message" id="message" />
+      <input type="submit" value="Submit" />
+    </form>
+    <ul id="messages"></ul>
+  </body>
+
+  <script>
+    $(function () {
+      var socket = io();
+      socket.on("broadcast data", function (msg) {
+        console.log(msg);
+        $("#messages").append($("<li>").text(msg.topic + ": " + msg.message));
+      });
+    });
+
+    $("#dataform").submit(function (event) {
+      event.preventDefault();
+      var dataObj = {};
+      dataObj.topic = $("#topic").val();
+      dataObj.message = $("#message").val();
+      $.ajax({
+        type: "POST",
+        url: "/post",
+        data: dataObj,
+        success: function (e) {
+          console.log("Submission was successful.");
+          console.log(e);
+        },
+        error: function (e) {
+          console.log("An error occurred.");
+          console.log(e);
+        },
+      });
+    });
+  </script>
+</html>
